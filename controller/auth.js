@@ -50,7 +50,7 @@ export const signUp = async (req, res) => {
       if(user.length <= 0) return await errorHandler(res, "Email not found", 404);
       const isMatch = bcrypt.compareSync(password, user[0].password);
       if(!isMatch) return await errorHandler(res, "Wrong Password", 401);
-      const token =  generateToken(user[0].id, user[0].email);
+      const token =  generateToken(user[0].id, user[0].email, user[0].role);
       console.log("token", token);
       const resultUser ={
         id: user[0].id,
@@ -80,7 +80,7 @@ export const loginWithGoogle = async (req, res) => {
     const user = await database(user_query, [userEmail]);
     console.log("user", user);
     if(user.length <= 0) return await errorHandler(res, "Email not found", 404);
-    const token =  generateToken(user[0].id, user[0].email);
+    const token =  generateToken(user[0].id, user[0].email, user[0].role);
     console.log("token", token);
     const resultUser ={
       id: user[0].id,
@@ -115,3 +115,24 @@ export const loginWithGoogle = async (req, res) => {
       return await errorHandler(res, "Un-Authorize User", 401);
     }
   };
+
+  export const adminAuth = async (req, res, next) => {
+    try {
+      const token = req.headers["authorization"].split("Bearer ")[1];
+      if (!token) {
+        return await errorHandler(res, "Un-Authorize User", 401);
+      } else {
+        const verifyEmail = jwt.verify(token, process.env.JWT_SECRET);
+        console.log("verifyEmail", verifyEmail);
+        if (verifyEmail.role !== "admin") {
+          return await errorHandler(res, "Only Admin Can Access", 401);
+        } else {
+          req.userId = verifyEmail.id;
+          next();
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      return await errorHandler(res, "Internal Server Error", 500);
+    }
+  }
