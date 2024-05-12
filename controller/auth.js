@@ -4,6 +4,7 @@ import { errorHandler, successHandler } from "../utils/handler.js";
 import database from "../db/connection.js";
 // import unirest from "unirest";
 import axios from "axios";
+import { validator } from "../utils/validator.js";
 
 
 function generateToken(userId,email) {
@@ -18,7 +19,12 @@ export const signUp = async (req, res) => {
       if(!email || !password){
         return await next(errorHandler(res, "Please Fill All The Details", 422)); 
       }
+
       const userEmail = await email.trim();
+      const validateEmail = validator("email", userEmail);
+      if(!validateEmail) return await errorHandler(res, "Invalid Email Format", 422);
+      const validatePassword = validator("password", password);
+      if(!validatePassword) return await errorHandler(res, "Invalid Password Format", 422);
       const user_query = `select * from users where email = ?`;
       const user = await database(user_query, [userEmail]);
       console.log("user", user);
