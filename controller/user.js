@@ -19,7 +19,6 @@ export const userProfile = async (req, res) => {
 
 export const editUser = async (req, res) => {
     try {
-        console.log("req.body");
         const {name, bio, phone,email, profile_visibility} = req.body;
         if(!name || !email || !profile_visibility) return await errorHandler(res, "Required information missing(name/email/profile_visibility)", 422);
         if(!validator(email)) return await errorHandler(res, "Invalid Email Format", 422);
@@ -86,7 +85,6 @@ export const profileUpload = async (req, res) => {
       if (err) {
         await next(errorHandler(res, err, 400));
       } else {
-        console.log("req.file", req.file, "req.user_id", req.user_id);
         const photo = await req.file;  
         const user_id = await req.userId; 
  
@@ -101,7 +99,6 @@ export const profileUpload = async (req, res) => {
         const photo_result = await database(photo_query, [user_id]);
         if(photo_result.length > 0 && photo_result[0].photoFileName){ 
             const fullPath = process.env.PROFILE_PATH + '/' + photo_result[0].photoFileName;
-            console.log("fullPath", fullPath);
         fs.unlink(fullPath, (err) => {
         if (err) {
           console.error('Error deleting file:', err);
