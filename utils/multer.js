@@ -3,7 +3,6 @@ import multer from "multer";
 export const uploadProfilePicture = ()=>{
     const storage = multer.diskStorage({
         destination: function (req, file, cb) {
-          console.log("multer", file.mimetype)
           if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg")
           cb(null, process.env.PROFILE_PATH)
           

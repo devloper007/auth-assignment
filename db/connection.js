@@ -10,9 +10,7 @@ async function database(query, val) {
     if(connection){
         console.log("connected to DB");
     }
-    console.log("val",val);
     const [rows] = await connection.query(query, val);
-  console.log("rows", rows);
   connection.end();
     return rows;
 }
