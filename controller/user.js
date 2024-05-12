@@ -3,6 +3,7 @@ import { errorHandler,successHandler } from "../utils/handler.js";
 // import bcrypt from "bcryptjs";
 import { uploadProfilePicture } from "../utils/multer.js";
 import fs from "fs";
+import { validator } from "../utils/validator.js";
 
 
 export const userProfile = async (req, res) => {
@@ -20,6 +21,9 @@ export const editUser = async (req, res) => {
     try {
         console.log("req.body");
         const {name, bio, phone,email, profile_visibility} = req.body;
+        if(!name || !email || !profile_visibility) return await errorHandler(res, "Required information missing(name/email/profile_visibility)", 422);
+        if(!validator(email)) return await errorHandler(res, "Invalid Email Format", 422);
+        if(!validator(phone)) return await errorHandler(res, "Invalid Phone Format", 422);
         const userId = req.userId;
         const user_update_query = 'update users set name = ?, bio = ?, phone = ? email = ?, profile_visibility = ? where id = ?';
         const val = [name, bio, phone, email, profile_visibility,userId];

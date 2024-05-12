@@ -1,21 +1,32 @@
 import express from "express";
-import authRouter from "./routes/authRoute.js";
-import userRouter from "./routes/userRoute.js";
-import bodyParser from "body-parser";
 import { configDotenv } from "dotenv";
 configDotenv({ path: "./.env" });
+import cors from 'cors';
+import bodyParser from "body-parser";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./utils/swagger.js";
+import getAuthRoute from "./routes/authRoute.js";
+import getUserRoute from "./routes/userRoute.js";
+
 
 const app =  express();
 
 // Middleware
+const corsOption = {
+    origin:'*' 
+  }
+  
+app.use(cors(corsOption));
 app.use(bodyParser.json());
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.get("/", (req, res) => {
-    res.send("Hello World!");
+    res.send("Server Running...");
 });
 
-app.use("/auth", authRouter);
-app.use("/user", userRouter);
+app.use("/auth", getAuthRoute);
+app.use("/user", getUserRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
