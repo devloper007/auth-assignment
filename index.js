@@ -3,8 +3,9 @@ import { configDotenv } from "dotenv";
 configDotenv({ path: "./.env" });
 import cors from 'cors';
 import bodyParser from "body-parser";
+import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from "./utils/swagger.js";
+// import { swaggerSpec } from "./utils/swagger.js";
 import getAuthRoute from "./routes/authRoute.js";
 import getUserRoute from "./routes/userRoute.js";
 
@@ -18,6 +19,38 @@ const corsOption = {
   
 app.use(cors(corsOption));
 app.use(bodyParser.json());
+
+const options = {
+    definition: {
+        openapi: "3.0.0",
+        info: {
+            title: "Auth-Assignment API",
+            version: "1.0.0",
+        },
+        servers: [
+            {
+                url: process.env.BASE_URL,
+            }
+        ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: "http",
+                        scheme: "bearer"
+                }
+            }
+            },
+            security: {
+                    bearerAuth: []
+        }
+    },
+    apis: [
+           "./routes/authRoute.js",
+           "./routes/userRoute.js"
+            ],
+};      
+
+const swaggerSpec = swaggerJSDoc(options);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

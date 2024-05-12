@@ -5,10 +5,9 @@ import { verifyToken,verifyRole } from "../controller/auth.js";
 const userRoute = express.Router();
 
 const getUserRoute = function(){
-console.log("getUserRoute");
     /**
 	 * @swagger
-	 * /user/get-public-user:
+	 * /user/public-users:
 	 *   get:
 	 *     summary: Get All Public User list.
 	 *     responses:
@@ -16,7 +15,7 @@ console.log("getUserRoute");
 	 *         description:
 	 */
 
-    userRoute.get('/get-public-user', getPublicUser);
+    userRoute.get('/public-users', getPublicUser);
 
     /**
 	 * @swagger
@@ -123,7 +122,7 @@ console.log("getUserRoute");
 
     /**
  * @swagger
- * /user/profile-pic-upload:
+ * /user/upload-profile-pic:
  *   post:
  *     summary: Upload Profile Picture.
  *     security:
@@ -168,7 +167,7 @@ console.log("getUserRoute");
  *                  data: null
  */
 
-    userRoute.post('/profile-pic-upload',verifyToken, profileUpload);
+    userRoute.post('/upload-profile-pic',verifyToken, profileUpload);
 
         /**
 	 * @swagger
