@@ -53,14 +53,14 @@ const options = {
 
 const swaggerSpec = swaggerJSDoc(options);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/.netlify/functions/index/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.get("/.auth-assignment/functions/index", (req, res) => {
+app.get("/.netlify/functions/index", (req, res) => {
     res.send("Server Running...");
 });
 
-app.use("/.auth-assignment/functions/index/auth", getAuthRoute);
-app.use("/.auth-assignment/functions/index/user", getUserRoute);
+app.use("/.netlify/functions/index/auth", getAuthRoute);
+app.use("/.netlify/functions/index/user", getUserRoute);
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
