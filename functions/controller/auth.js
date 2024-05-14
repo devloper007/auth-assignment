@@ -5,6 +5,7 @@ import database from "../db/connection.js";
 // import unirest from "unirest";
 import axios from "axios";
 import { validator } from "../utils/validator.js";
+import moment from "moment";
 
 
 function generateToken(userId,email) {
@@ -146,7 +147,6 @@ export const loginWithGoogle = async (req, res) => {
   export const sendOTP = async (req, res) => {
     try {
         const {phone} = req.body;
-        console.log("req.body 144");
         const otp_query = 'select * from user_otp where user_id = ?';
         const otp_result = await database(otp_query, [req.userId]);
         if(otp_result.length > 0){
@@ -155,10 +155,8 @@ export const loginWithGoogle = async (req, res) => {
         } 
         
         const otp =  generateOTP();
-        const currentDate =  new Date( Date.now() + 10 * 60 * 1000);
-        const expires_at = currentDate.toISOString().slice(0, 19).replace('T', ' ');
-        console.log("otp", otp, 'expires_at', expires_at);
-
+        const expires_at = moment.utc().add(10, 'm').toDate();
+      
         axios.get(`https://www.fast2sms.com/dev/bulkV2?authorization=${process.env.SMS_AUTH_KEY}&variables_values=${otp}&route=otp&numbers=${phone}`).then(async (response) => {
             console.log("response 150", response.data);
             const otp_save_query = 'insert into user_otp (user_id, otp, expires_at) values (?)';
@@ -180,12 +178,12 @@ export const loginWithGoogle = async (req, res) => {
         const otp_query = 'select * from user_otp where user_id = ?';
         const otp_result = await database(otp_query, [req.userId]);
         if(otp_result.length > 0){
-            if(otp_result[0].otp === otp){
+            if(otp_result[0].otp === otp && otp_result[0].expires_at > moment.utc().toDate()){
                 // const delete_otp_query = 'delete from user_otp where user_id = ?';
                 // await database(delete_otp_query, [req.userId]);
                 return await successHandler(res, "OTP Verified Successfully", 200);
             }else{
-                return await errorHandler(res, "Invalid OTP", 401);
+                return await errorHandler(res, "Invalid OTP/OTP Expired", 401);
             }
         }else{
             return await errorHandler(res, "OTP Not Found! Please Send OTP Again", 401);
